@@ -404,13 +404,14 @@
             padding-right: 4px;
         }
         
+        /* Modification de comp-item pour accueillir les 3 blocs */
         .comp-item {
             background: #131b2c;
             border-radius: 16px;
             padding: 12px 16px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center; /* Centré verticalement */
             border-left: 4px solid #c9a03d;
             gap: 12px;
         }
@@ -419,7 +420,8 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            flex: 1;
+            flex: 1; /* Prend l'espace disponible à gauche */
+            min-width: 150px; /* Évite que ça se tasse trop */
         }
 
         .comp-name { 
@@ -429,17 +431,18 @@
             gap: 8px; 
         }
         
-        /* --- NOUVEAU : Style pour les miniatures dans les compositions --- */
-        .comp-miniatures {
+        /* --- NOUVEAU : Conteneur pour les images à droite --- */
+        .comp-visuals {
             display: flex;
             flex-wrap: wrap;
             gap: 4px;
-            margin-top: 4px;
+            justify-content: flex-end; /* Aligne les images vers la droite */
+            max-width: 180px; /* Limite la largeur pour ne pas écraser les boutons */
         }
         
         .comp-mini-img {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
             background: #0f172a;
             border-radius: 6px;
@@ -875,6 +878,7 @@
             const compDiv = document.createElement('div');
             compDiv.className = 'comp-item';
             
+            // --- PARTIE GAUCHE : NOM + TAGS ---
             const contentDiv = document.createElement('div');
             contentDiv.className = 'comp-content';
             
@@ -886,26 +890,6 @@
             nameSpan.innerHTML = '<i class="fas fa-shield-halved"></i> <strong>' + escapeHtml(comp.name) + '</strong> <span style="font-size:0.7rem; color:#c9a03d;">(' + nonEmptyCount + '/' + slotCount + ' persos)</span>';
             
             contentDiv.appendChild(nameSpan);
-            
-            // --- NOUVEAU : Ajout des miniatures des personnages ---
-            const miniaturesDiv = document.createElement('div');
-            miniaturesDiv.className = 'comp-miniatures';
-            
-            comp.teamData.forEach(perso => {
-                if (perso && perso.img) {
-                    const miniImg = document.createElement('img');
-                    miniImg.className = 'comp-mini-img';
-                    miniImg.src = perso.img;
-                    miniImg.alt = perso.name;
-                    miniImg.title = perso.name; // Info-bulle au survol
-                    miniaturesDiv.appendChild(miniImg);
-                }
-            });
-            
-            if (miniaturesDiv.hasChildNodes()) {
-                contentDiv.appendChild(miniaturesDiv);
-            }
-            // -----------------------------------------------------
             
             if (comp.tags && comp.tags.length > 0) {
                 const tagsDiv = document.createElement('div');
@@ -919,6 +903,22 @@
                 contentDiv.appendChild(tagsDiv);
             }
             
+            // --- PARTIE DROITE : MINIATURES ---
+            const visualsDiv = document.createElement('div');
+            visualsDiv.className = 'comp-visuals';
+            
+            comp.teamData.forEach(perso => {
+                if (perso && perso.img) {
+                    const miniImg = document.createElement('img');
+                    miniImg.className = 'comp-mini-img';
+                    miniImg.src = perso.img;
+                    miniImg.alt = perso.name;
+                    miniImg.title = perso.name;
+                    visualsDiv.appendChild(miniImg);
+                }
+            });
+            
+            // --- BOUTONS D'ACTION ---
             const actions = document.createElement('div');
             actions.className = 'comp-actions';
             
@@ -944,8 +944,11 @@
             actions.appendChild(overwriteBtn);
             actions.appendChild(deleteBtn);
             
+            // --- ASSEMBLAGE ---
             compDiv.appendChild(contentDiv);
-            compDiv.appendChild(actions);
+            compDiv.appendChild(visualsDiv); // Les images au milieu/droite
+            compDiv.appendChild(actions);    // Les boutons tout à droite
+            
             compListContainer.appendChild(compDiv);
         });
     }
@@ -1074,7 +1077,6 @@
             imgEl.alt = cls.name;
             imgEl.loading = 'lazy';
             
-            // Fallback si l'image ne charge pas
             imgEl.onerror = function() {
                 this.style.display = 'none';
                 const fallbackText = document.createElement('div');
