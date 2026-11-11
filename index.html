@@ -430,22 +430,30 @@
             white-space: nowrap;
         }
         
-        /* --- ORGANISATION DES MINIATURES EN DEUX LIGNES --- */
+        /* --- ORGANISATION DES MINIATURES (GRILLES FIXES) --- */
         .comp-visuals {
             display: flex;
-            flex-direction: column; /* Organise en colonnes (lignes de haut en bas) */
-            align-items: flex-end; /* Aligne tout à droite */
+            flex-direction: column; 
+            align-items: flex-end; 
             gap: 6px;
             flex: 1;
             padding-right: 20px;
         }
         
-        /* Ligne contenant les images */
         .comp-visuals-row {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
             gap: 6px;
             justify-content: flex-end;
+        }
+        
+        /* Limite la ligne des classes à 4 max */
+        .comp-visuals-row.classes {
+            grid-template-columns: repeat(4, 42px);
+        }
+        
+        /* Limite la ligne des boss à 5 max */
+        .comp-visuals-row.bosses {
+            grid-template-columns: repeat(5, 42px);
         }
         
         .comp-mini-img {
@@ -938,7 +946,7 @@
             
             // Ligne 1 : les classes (issues des slots)
             const classesRow = document.createElement('div');
-            classesRow.className = 'comp-visuals-row';
+            classesRow.className = 'comp-visuals-row classes'; // <-- Ajout de la classe 'classes'
             comp.teamData.forEach(perso => {
                 if (perso && perso.img) {
                     const miniImg = document.createElement('img');
@@ -954,7 +962,7 @@
             // Ligne 2 : les boss (sélectionnés via le panneau de droite)
             if (comp.bosses && comp.bosses.length > 0) {
                 const bossesRow = document.createElement('div');
-                bossesRow.className = 'comp-visuals-row';
+                bossesRow.className = 'comp-visuals-row bosses'; // <-- Ajout de la classe 'bosses'
                 comp.bosses.forEach(boss => {
                     if (boss && boss.img) {
                         const miniImg = document.createElement('img');
