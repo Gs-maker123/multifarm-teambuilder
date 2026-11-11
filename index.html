@@ -134,7 +134,7 @@
             margin-bottom: 8px;
             filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4));
             pointer-events: none;
-            background: #0f172a; /* Fond noir pour voir l'image si elle est transparente */
+            background: #0f172a; 
             border-radius: 8px;
         }
 
@@ -581,9 +581,8 @@
     ];
 
     // ---------------------------------------------------------
-    // LISTE DROITE : Efficacité (Monstres / Donjons)
+    // LISTE DROITE : Efficacité (Ta liste exacte)
     // ---------------------------------------------------------
-    // Vérifie bien que le "imgName" correspond exactement au nom du fichier dans ton dossier boss_2/
     const EFFICIENCY_CLASSES_LIST = [
         { id: "nidas", name: "Nidas", imgName: "3648.png" }, 
         { id: "harebourg", name: "Comte Harebourg", imgName: "300_300.png" },
@@ -1020,7 +1019,7 @@
         });
     }
     
-    // Fonction sans le fallback qui cassait les images des monstres
+    // Fonction pour générer la grille avec gestion des images manquantes
     function generateClassGrid(container, classes, imgPath) {
         container.innerHTML = '';
         classes.forEach(cls => {
@@ -1048,7 +1047,19 @@
             imgEl.alt = cls.name;
             imgEl.loading = 'lazy';
             
-            // Plus de fallback ! Si l'image n'est pas trouvée, on laisse vide.
+            // Si l'image ne charge pas, on affiche un petit texte de remplacement
+            imgEl.onerror = function() {
+                this.style.display = 'none'; // On cache l'image cassée
+                const fallbackText = document.createElement('div');
+                fallbackText.innerText = "Pas d'img";
+                fallbackText.style.color = "#7c8aa8";
+                fallbackText.style.fontSize = "0.7rem";
+                fallbackText.style.marginBottom = "8px";
+                fallbackText.style.height = "55px";
+                fallbackText.style.display = "flex";
+                fallbackText.style.alignItems = "center";
+                card.insertBefore(fallbackText, card.firstChild);
+            };
             
             const nameDiv = document.createElement('div');
             nameDiv.className = 'class-name';
@@ -1061,10 +1072,7 @@
     }
 
     function buildClassLibrary() {
-        // Panneau de gauche
         generateClassGrid(classGridContainer, CLASSES_LIST, IMG_PATH_LIBRARY);
-        
-        // Panneau de droite (avec tes monstres)
         generateClassGrid(efficiencyGridContainer, EFFICIENCY_CLASSES_LIST, IMG_PATH_EFFICIENCY); 
     }
     
