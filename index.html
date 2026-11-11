@@ -420,7 +420,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            flex: 0 1 auto; /* Prend la place nécessaire mais peut rétrécir */
+            flex: 0 1 auto;
         }
 
         .comp-name { 
@@ -428,28 +428,28 @@
             display: flex; 
             align-items: center; 
             gap: 8px; 
-            white-space: nowrap; /* Empêche le titre de passer à la ligne */
+            white-space: nowrap;
         }
         
         /* Conteneur pour les images, prend tout l'espace disponible */
         .comp-visuals {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px; /* Un peu plus d'espace entre les images */
-            align-items: center; /* Centre verticalement */
-            flex: 1; /* Prend tout l'espace disponible entre le texte et les boutons */
-            justify-content: flex-end; /* Aligne les images vers la droite (vers les boutons) */
-            padding-right: 15px; /* Espace avant les boutons */
+            gap: 6px;
+            align-items: center;
+            flex: 1;
+            justify-content: flex-end; /* Aligne vers la droite */
+            padding-right: 15px;
         }
         
         .comp-mini-img {
-            width: 42px;  /* Taille augmentée pour bien voir les boss */
+            width: 42px;
             height: 42px;
             object-fit: contain;
             background: #0f172a;
             border-radius: 8px;
             border: 1px solid #334155;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Petite ombre pour le style */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .comp-tags {
@@ -473,7 +473,7 @@
             display: flex; 
             gap: 8px; 
             flex-shrink: 0; 
-            margin-left: auto; /* S'assure que les boutons restent à droite */
+            margin-left: auto;
         }
         
         .icon-btn {
