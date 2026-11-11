@@ -93,6 +93,20 @@
             padding-bottom: 10px;
         }
 
+        /* Test visuel de mise à jour */
+        .update-test {
+            background: #ff000033;
+            color: #ff4d4d;
+            padding: 5px;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
         .class-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -540,6 +554,10 @@
                 <i class="fas fa-book-open"></i>
                 <span>Efficacité pour le donjon :</span>
             </div>
+            
+            <!-- TEST VISUEL : Si tu vois ce texte, le code est à jour -->
+            <div class="update-test">✅ CODE À JOUR (v2) - Si tu vois les classes Dofus, c'est le cache !</div>
+            
             <div class="class-grid" id="efficiencyGridContainer"></div>
             <div style="margin-top: 18px; font-size:0.75rem; text-align:center; color:#7c8aa8;">
                 <i class="fas fa-arrows-alt"></i> Drag & drop vers l'équipe
@@ -549,15 +567,9 @@
 </div>
 
 <script>
-    // ---------------------------------------------------------
-    // CONFIGURATION DES IMAGES
-    // ---------------------------------------------------------
-    const IMG_PATH_LIBRARY = "img/";           // Dossier de gauche
-    const IMG_PATH_EFFICIENCY = "boss_2/";     // Dossier de droite
+    const IMG_PATH_LIBRARY = "img/";           
+    const IMG_PATH_EFFICIENCY = "boss_2/";     
 
-    // ---------------------------------------------------------
-    // LISTE GAUCHE : Classes Dofus classiques
-    // ---------------------------------------------------------
     const CLASSES_LIST = [
         { id: "cra", name: "Cra", imgName: "Cra_Logo.webp" },
         { id: "iop", name: "Iop", imgName: "Iop_Logo.webp" },
@@ -580,43 +592,40 @@
         { id: "sadida", name: "Sadida", imgName: "Sadida_Logo.webp" }
     ];
 
-    // ---------------------------------------------------------
-    // LISTE DROITE : Efficacité (Ta liste exacte)
-    // ---------------------------------------------------------
-const EFFICIENCY_CLASSES_LIST = [
-    { id: "nidas", name: "Nidas", imgName: "3648.png" }, 
-    { id: "harebourg", name: "Comte Harebourg", imgName: "300_300.png" },
-    { id: "ougah", name: "Ougah", imgName: "300_300_2.png" },
-    { id: "korriandre", name: "Korriandre", imgName: "2968.png" },
-    { id: "phossile", name: "Phossile", imgName: "3651.png" },
-    { id: "mallefisk", name: "Malléfisk", imgName: "3652.w200h.png" },
-    { id: "rdv", name: "Reine des Voleurs", imgName: "3726.png" },
-    { id: "toxoliath", name: "Toxoliath", imgName: "3752.w200h.png" },
-    { id: "ripate", name: "Ben le Ripate", imgName: "Ben.png" },
-    { id: "bworker", name: "Bworker", imgName: "Bworker.png" },
-    { id: "corailleur", name: "Corailleur Magistrale", imgName: "Corailleur_Magistrale.png" }, // Underscore
-    { id: "dramak", name: "Dramak", imgName: "Dramak.png" },
-    { id: "fuji", name: "Fuji Givrefoux", imgName: "Fuji_Givrefoux.png" }, // Underscore
-    { id: "glourseleste", name: "Glourséleste", imgName: "Glourséleste.png" },
-    { id: "gourlo", name: "Gourlo le Terrible", imgName: "Gourlo.png" },
-    { id: "grolloum", name: "Grolloum", imgName: "Grolloum.png" },
-    { id: "kanigroula", name: "Kanigroula", imgName: "Kanigroula.png" },
-    { id: "kimbo", name: "Kimbo", imgName: "Kimbo.png" },
-    { id: "klime", name: "Klime", imgName: "Klime.png" },
-    { id: "kolosso", name: "Kolosso", imgName: "Kolosso.png" },
-    { id: "mansot", name: "Mansot Royal", imgName: "Mansot_Royal.png" }, // Underscore
-    { id: "minotoror", name: "Minotoror", imgName: "Minotoror.png" },
-    { id: "miontot", name: "Minotot", imgName: "Minotot.png" },
-    { id: "frizz", name: "Missiz Frizz", imgName: "Missiz_Frizz.png" }, // Underscore
-    { id: "nileza", name: "Nileza", imgName: "Nileza.png" },
-    { id: "obsidantre", name: "Obsidiantre", imgName: "Obsidiantre.png" },
-    { id: "rasboul", name: "Rasboul", imgName: "Rasboul.png" },
-    { id: "royalmouth", name: "Royalmouth", imgName: "Royalmouth.png" },
-    { id: "skeunk", name: "Skeunk", imgName: "Skeunk.png" },
-    { id: "sylargh", name: "Sylargh", imgName: "Sylargh.png" },
-    { id: "tengu", name: "Tengu Givrefoux", imgName: "Tengu_Givrefoux.png" }, // Underscore
-    { id: "tynril", name: "Tynril", imgName: "Tynril.png" }
-];
+    const EFFICIENCY_CLASSES_LIST = [
+        { id: "nidas", name: "Nidas", imgName: "3648.png" }, 
+        { id: "harebourg", name: "Comte Harebourg", imgName: "300_300.png" },
+        { id: "ougah", name: "Ougah", imgName: "300_300_2.png" },
+        { id: "korriandre", name: "Korriandre", imgName: "2968.png" },
+        { id: "phossile", name: "Phossile", imgName: "3651.png" },
+        { id: "mallefisk", name: "Malléfisk", imgName: "3652.w200h.png" },
+        { id: "rdv", name: "Reine des Voleurs", imgName: "3726.png" },
+        { id: "toxoliath", name: "Toxoliath", imgName: "3752.w200h.png" },
+        { id: "ripate", name: "Ben le Ripate", imgName: "Ben.png" },
+        { id: "bworker", name: "Bworker", imgName: "Bworker.png" },
+        { id: "corailleur", name: "Corailleur Magistrale", imgName: "Corailleur_Magistrale.png" }, 
+        { id: "dramak", name: "Dramak", imgName: "Dramak.png" },
+        { id: "fuji", name: "Fuji Givrefoux", imgName: "Fuji_Givrefoux.png" }, 
+        { id: "glourseleste", name: "Glourséleste", imgName: "Glourséleste.png" },
+        { id: "gourlo", name: "Gourlo le Terrible", imgName: "Gourlo.png" },
+        { id: "grolloum", name: "Grolloum", imgName: "Grolloum.png" },
+        { id: "kanigroula", name: "Kanigroula", imgName: "Kanigroula.png" },
+        { id: "kimbo", name: "Kimbo", imgName: "Kimbo.png" },
+        { id: "klime", name: "Klime", imgName: "Klime.png" },
+        { id: "kolosso", name: "Kolosso", imgName: "Kolosso.png" },
+        { id: "mansot", name: "Mansot Royal", imgName: "Mansot_Royal.png" }, 
+        { id: "minotoror", name: "Minotoror", imgName: "Minotoror.png" },
+        { id: "miontot", name: "Minotot", imgName: "Minotot.png" },
+        { id: "frizz", name: "Missiz Frizz", imgName: "Missiz_Frizz.png" }, 
+        { id: "nileza", name: "Nileza", imgName: "Nileza.png" },
+        { id: "obsidantre", name: "Obsidiantre", imgName: "Obsidiantre.png" },
+        { id: "rasboul", name: "Rasboul", imgName: "Rasboul.png" },
+        { id: "royalmouth", name: "Royalmouth", imgName: "Royalmouth.png" },
+        { id: "skeunk", name: "Skeunk", imgName: "Skeunk.png" },
+        { id: "sylargh", name: "Sylargh", imgName: "Sylargh.png" },
+        { id: "tengu", name: "Tengu Givrefoux", imgName: "Tengu_Givrefoux.png" }, 
+        { id: "tynril", name: "Tynril", imgName: "Tynril.png" }
+    ];
 
     const TAGS_LIST = ["Farm", "Donjon", "Mêlée", "Distance", "Zone", "Succès", "Songes"];
 
@@ -1019,7 +1028,6 @@ const EFFICIENCY_CLASSES_LIST = [
         });
     }
     
-    // Fonction pour générer la grille avec gestion des images manquantes
     function generateClassGrid(container, classes, imgPath) {
         container.innerHTML = '';
         classes.forEach(cls => {
@@ -1047,9 +1055,9 @@ const EFFICIENCY_CLASSES_LIST = [
             imgEl.alt = cls.name;
             imgEl.loading = 'lazy';
             
-            // Si l'image ne charge pas, on affiche un petit texte de remplacement
+            // Fallback si l'image ne charge pas
             imgEl.onerror = function() {
-                this.style.display = 'none'; // On cache l'image cassée
+                this.style.display = 'none';
                 const fallbackText = document.createElement('div');
                 fallbackText.innerText = "Pas d'img";
                 fallbackText.style.color = "#7c8aa8";
