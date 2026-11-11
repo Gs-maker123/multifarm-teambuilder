@@ -435,20 +435,21 @@
         .comp-visuals {
             display: flex;
             flex-wrap: wrap;
-            gap: 4px;
-            justify-content: flex-end;
-            flex: 1; /* Prend tout l'espace restant au milieu */
-            margin-left: auto; /* Pousse les images vers la droite */
-            padding-right: 12px;
+            gap: 6px; /* Un peu plus d'espace entre les images */
+            align-items: center; /* Centre verticalement */
+            flex: 1; /* Prend tout l'espace disponible entre le texte et les boutons */
+            justify-content: flex-end; /* Aligne les images vers la droite (vers les boutons) */
+            padding-right: 15px; /* Espace avant les boutons */
         }
         
         .comp-mini-img {
-            width: 40px;
-            height: 32px;
+            width: 42px;  /* Taille augmentée pour bien voir les boss */
+            height: 42px;
             object-fit: contain;
             background: #0f172a;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 1px solid #334155;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Petite ombre pour le style */
         }
 
         .comp-tags {
