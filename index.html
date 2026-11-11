@@ -93,20 +93,6 @@
             padding-bottom: 10px;
         }
 
-        /* Test visuel de mise à jour */
-        .update-test {
-            background: #ff000033;
-            color: #ff4d4d;
-            padding: 5px;
-            text-align: center;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin-bottom: 15px;
-            animation: blink 1s infinite;
-        }
-        @keyframes blink { 50% { opacity: 0; } }
-
         .class-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -413,7 +399,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            max-height: 240px;
+            max-height: 300px;
             overflow-y: auto;
             padding-right: 4px;
         }
@@ -443,6 +429,23 @@
             gap: 8px; 
         }
         
+        /* --- NOUVEAU : Style pour les miniatures dans les compositions --- */
+        .comp-miniatures {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        
+        .comp-mini-img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            background: #0f172a;
+            border-radius: 6px;
+            border: 1px solid #334155;
+        }
+
         .comp-tags {
             display: flex;
             flex-wrap: wrap;
@@ -554,7 +557,6 @@
                 <i class="fas fa-book-open"></i>
                 <span>Efficacité pour le donjon :</span>
             </div>
-            
             <div class="class-grid" id="efficiencyGridContainer"></div>
             <div style="margin-top: 18px; font-size:0.75rem; text-align:center; color:#7c8aa8;">
                 <i class="fas fa-arrows-alt"></i> Drag & drop vers l'équipe
@@ -600,9 +602,9 @@
         { id: "toxoliath", name: "Toxoliath", imgName: "3752.w200h.png" },
         { id: "ripate", name: "Ben le Ripate", imgName: "Ben.png" },
         { id: "bworker", name: "Bworker", imgName: "Bworker.png" },
-        { id: "corailleur", name: "Corailleur Magistrale", imgName: "Corailleur Magistrale.png" }, 
+        { id: "corailleur", name: "Corailleur Magistrale", imgName: "Corailleur_Magistrale.png" }, 
         { id: "dramak", name: "Dramak", imgName: "Dramak.png" },
-        { id: "fuji", name: "Fuji Givrefoux", imgName: "Fuji Givrefoux.png" }, 
+        { id: "fuji", name: "Fuji Givrefoux", imgName: "Fuji_Givrefoux.png" }, 
         { id: "glourseleste", name: "Glourséleste", imgName: "Glourséleste.png" },
         { id: "gourlo", name: "Gourlo le Terrible", imgName: "Gourlo.png" },
         { id: "grolloum", name: "Grolloum", imgName: "Grolloum.png" },
@@ -610,17 +612,17 @@
         { id: "kimbo", name: "Kimbo", imgName: "Kimbo.png" },
         { id: "klime", name: "Klime", imgName: "Klime.png" },
         { id: "kolosso", name: "Kolosso", imgName: "Kolosso.png" },
-        { id: "mansot", name: "Mansot Royal", imgName: "Mansot Royal.png" }, 
+        { id: "mansot", name: "Mansot Royal", imgName: "Mansot_Royal.png" }, 
         { id: "minotoror", name: "Minotoror", imgName: "Minotoror.png" },
         { id: "miontot", name: "Minotot", imgName: "Minotot.png" },
-        { id: "frizz", name: "Missiz Frizz", imgName: "Missiz Frizz.png" }, 
+        { id: "frizz", name: "Missiz Frizz", imgName: "Missiz_Frizz.png" }, 
         { id: "nileza", name: "Nileza", imgName: "Nileza.png" },
         { id: "obsidantre", name: "Obsidiantre", imgName: "Obsidiantre.png" },
         { id: "rasboul", name: "Rasboul", imgName: "Rasboul.png" },
         { id: "royalmouth", name: "Royalmouth", imgName: "Royalmouth.png" },
         { id: "skeunk", name: "Skeunk", imgName: "Skeunk.png" },
         { id: "sylargh", name: "Sylargh", imgName: "Sylargh.png" },
-        { id: "tengu", name: "Tengu Givrefoux", imgName: "Tengu Givrefoux.png" }, 
+        { id: "tengu", name: "Tengu Givrefoux", imgName: "Tengu_Givrefoux.png" }, 
         { id: "tynril", name: "Tynril", imgName: "Tynril.png" }
     ];
 
@@ -884,6 +886,26 @@
             nameSpan.innerHTML = '<i class="fas fa-shield-halved"></i> <strong>' + escapeHtml(comp.name) + '</strong> <span style="font-size:0.7rem; color:#c9a03d;">(' + nonEmptyCount + '/' + slotCount + ' persos)</span>';
             
             contentDiv.appendChild(nameSpan);
+            
+            // --- NOUVEAU : Ajout des miniatures des personnages ---
+            const miniaturesDiv = document.createElement('div');
+            miniaturesDiv.className = 'comp-miniatures';
+            
+            comp.teamData.forEach(perso => {
+                if (perso && perso.img) {
+                    const miniImg = document.createElement('img');
+                    miniImg.className = 'comp-mini-img';
+                    miniImg.src = perso.img;
+                    miniImg.alt = perso.name;
+                    miniImg.title = perso.name; // Info-bulle au survol
+                    miniaturesDiv.appendChild(miniImg);
+                }
+            });
+            
+            if (miniaturesDiv.hasChildNodes()) {
+                contentDiv.appendChild(miniaturesDiv);
+            }
+            // -----------------------------------------------------
             
             if (comp.tags && comp.tags.length > 0) {
                 const tagsDiv = document.createElement('div');
