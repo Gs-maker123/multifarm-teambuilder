@@ -134,6 +134,8 @@
             margin-bottom: 8px;
             filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4));
             pointer-events: none;
+            background: #0f172a; /* Fond noir pour voir l'image si elle est transparente */
+            border-radius: 8px;
         }
 
         .class-name { 
@@ -144,6 +146,10 @@
             padding: 4px 10px; 
             border-radius: 40px; 
             pointer-events: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         .team-header {
@@ -547,7 +553,7 @@
     // CONFIGURATION DES IMAGES
     // ---------------------------------------------------------
     const IMG_PATH_LIBRARY = "img/";           // Dossier de gauche
-    const IMG_PATH_EFFICIENCY = "boss_2/";     // Dossier de droite (modifié ici)
+    const IMG_PATH_EFFICIENCY = "boss_2/";     // Dossier de droite
 
     // ---------------------------------------------------------
     // LISTE GAUCHE : Classes Dofus classiques
@@ -575,13 +581,12 @@
     ];
 
     // ---------------------------------------------------------
-    // LISTE DROITE : Efficacité (Modifie librement les noms et les fichiers ici)
+    // LISTE DROITE : Efficacité (Monstres / Donjons)
     // ---------------------------------------------------------
+    // Vérifie bien que le "imgName" correspond exactement au nom du fichier dans ton dossier boss_2/
     const EFFICIENCY_CLASSES_LIST = [
-        // Exemple : j'ai gardé les noms mais tu peux les changer en "Cra Boss", "Iop Boss", etc.
-        // et changer les noms de fichiers pour correspondre à ce que tu as dans le dossier boss_2.
         { id: "nidas", name: "Nidas", imgName: "3648.png" }, 
-        { id: "harebourg", name: "Compte Harebourg", imgName: "300_300.png" },
+        { id: "harebourg", name: "Comte Harebourg", imgName: "300_300.png" },
         { id: "ougah", name: "Ougah", imgName: "300_300_2.png" },
         { id: "korriandre", name: "Korriandre", imgName: "2968.png" },
         { id: "phossile", name: "Phossile", imgName: "3651.png" },
@@ -611,7 +616,7 @@
         { id: "skeunk", name: "Skeunk", imgName: "Skeunk.png" },
         { id: "sylargh", name: "Sylargh", imgName: "Sylargh.png" },
         { id: "tengu", name: "Tengu Givrefoux", imgName: "Tengu_Givrefoux.png" },
-        { id: "tynril", name: "Klime", imgName: "Tynril.png" }
+        { id: "tynril", name: "Tynril", imgName: "Tynril.png" }
     ];
 
     const TAGS_LIST = ["Farm", "Donjon", "Mêlée", "Distance", "Zone", "Succès", "Songes"];
@@ -1015,6 +1020,7 @@
         });
     }
     
+    // Fonction sans le fallback qui cassait les images des monstres
     function generateClassGrid(container, classes, imgPath) {
         container.innerHTML = '';
         classes.forEach(cls => {
@@ -1042,10 +1048,7 @@
             imgEl.alt = cls.name;
             imgEl.loading = 'lazy';
             
-            // Fallback si l'image n'est pas trouvée dans le dossier spécifique
-            imgEl.onerror = function() {
-                this.src = IMG_PATH_LIBRARY + cls.imgName; 
-            };
+            // Plus de fallback ! Si l'image n'est pas trouvée, on laisse vide.
             
             const nameDiv = document.createElement('div');
             nameDiv.className = 'class-name';
@@ -1058,10 +1061,10 @@
     }
 
     function buildClassLibrary() {
-        // Panneau de gauche avec la liste classique
+        // Panneau de gauche
         generateClassGrid(classGridContainer, CLASSES_LIST, IMG_PATH_LIBRARY);
         
-        // Panneau de droite avec la NOUVELLE liste indépendante
+        // Panneau de droite (avec tes monstres)
         generateClassGrid(efficiencyGridContainer, EFFICIENCY_CLASSES_LIST, IMG_PATH_EFFICIENCY); 
     }
     
