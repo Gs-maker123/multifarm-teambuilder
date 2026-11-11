@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Mulmtifarm Team Builder - Slots dynamiques (max 8)</title>
+    <title>Multifarm Team Builder - Slots dynamiques (max 8)</title>
     
-    <!-- FAVICON AJOUTÉ ICI -->
-    <link rel="icon" type="image/png" href="favicon-16x16 (2).png">
+    <link rel="icon" type="image/png" href="favicon.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -18,7 +17,6 @@
             user-select: none;
         }
 
-        /* Correction pour permettre la sélection de texte dans les inputs */
         input, textarea, select {
             user-select: text;
         }
@@ -59,7 +57,6 @@
             gap: 28px;
         }
 
-        /* Panneau gauche */
         .library-panel {
             flex: 1.2;
             min-width: 260px;
@@ -126,7 +123,6 @@
             border-radius: 40px; 
         }
 
-        /* Panneau équipe */
         .team-panel {
             flex: 2;
             min-width: 380px;
@@ -186,7 +182,6 @@
         }
         .reset-btn:hover { background: #4c3b2c; transform: scale(0.96); }
 
-        /* Slots */
         .slots-container {
             display: flex;
             flex-direction: column;
@@ -252,7 +247,6 @@
         }
         .remove-btn:hover { background: #ff4d4d20; transform: scale(1.1); }
 
-        /* Zone sauvegarde */
         .save-section {
             background: #0c1122cc;
             border-radius: 24px;
@@ -289,7 +283,6 @@
         }
         .save-input-group input:focus { border-color: #f5bc4e; }
 
-        /* Styles pour la sélection des tags */
         .tag-selector {
             display: flex;
             flex-wrap: wrap;
@@ -328,7 +321,6 @@
             box-shadow: 0 0 8px rgba(201, 160, 61, 0.2);
         }
 
-        /* Filtre de tri */
         .filter-group {
             display: flex;
             align-items: center;
@@ -366,10 +358,13 @@
             cursor: pointer;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             white-space: nowrap;
+            transition: 0.2s;
         }
         .btn-primary:hover { background: #e0b354; }
+        
         .btn-secondary {
             background: #2d3a5e;
             border: none;
@@ -377,7 +372,9 @@
             padding: 8px 16px;
             border-radius: 40px;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .btn-secondary:hover { background: #3c4b75; }
         
         .compositions-list {
             display: flex;
@@ -413,7 +410,6 @@
             gap: 8px; 
         }
         
-        /* Affichage des tags dans comp-item */
         .comp-tags {
             display: flex;
             flex-wrap: wrap;
@@ -441,6 +437,7 @@
             font-size: 1.1rem;
             padding: 6px;
             border-radius: 50%;
+            transition: 0.2s;
         }
         .icon-btn:hover { color: #f5bc4e; background: #ffffff10; }
         .danger-btn:hover { color: #ff8a7a; }
@@ -463,7 +460,6 @@
     </div>
 
     <div class="builder-layout">
-        <!-- Bibliothèque -->
         <div class="library-panel">
             <div class="library-title">
                 <i class="fas fa-book-open"></i>
@@ -475,7 +471,6 @@
             </div>
         </div>
 
-        <!-- Panneau équipe -->
         <div class="team-panel">
             <div class="team-header">
                 <h2><i class="fas fa-users"></i> Mon équipe <span id="slotCounterBadge" class="slot-counter">0/8 slots</span></h2>
@@ -489,31 +484,28 @@
                 <i class="fas fa-arrows-alt"></i> Déplacez les personnages entre les slots (glisser-déposer)
             </div>
 
-            <!-- Sauvegarde avec tags et filtre -->
             <div class="save-section">
                 <div class="save-header">
                     <div class="save-input-group">
                         <input type="text" id="compNameInput" placeholder="Nom de la composition (ex: Team Donjon)" maxlength="30">
-                        <button id="saveCompBtn" class="btn-primary"><i class="fas fa-save"></i> </button>
+                        <button id="saveCompBtn" class="btn-primary" title="Sauvegarder la composition"><i class="fas fa-save"></i></button>
                     </div>
                     
                     <div class="tag-selector" id="tagSelector">
                         <span><i class="fas fa-tags"></i> Tags :</span>
-                        <!-- Les boutons de tags seront générés ici par JS -->
                     </div>
                     
                     <div class="filter-group">
                         <label for="filterTagSelect"><i class="fas fa-filter"></i> Filtrer :</label>
                         <select id="filterTagSelect">
                             <option value="all">Toutes les compositions</option>
-                            <!-- Les options de tags seront générées ici par JS -->
                         </select>
                     </div>
                 </div>
                 
-                <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
+                <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
                     <span><i class="fas fa-archive"></i> Mes compositions</span>
-                    <button id="clearAllCompsBtn" class="btn-secondary" style="background:#3a2a2a;"><i class="fas fa-trash-alt"></i> </button>
+                    <button id="clearAllCompsBtn" class="btn-secondary" style="background:#3a2a2a;" title="Tout supprimer"><i class="fas fa-trash-alt"></i></button>
                 </div>
                 <div id="compositionsListContainer" class="compositions-list">
                     <div style="text-align:center; color:#6b7c9e;">Chargement...</div>
@@ -524,9 +516,6 @@
 </div>
 
 <script>
-    // --------------------------------------------------------------
-    // LISTE DES CLASSES DOFUS
-    // --------------------------------------------------------------
     const CLASSES_LIST = [
         { id: "cra", name: "Cra", img: "img/Cra_Logo.webp" },
         { id: "iop", name: "Iop", img: "img/Iop_Logo.webp" },
@@ -549,21 +538,15 @@
         { id: "sadida", name: "Sadida", img: "img/Sadida_Logo.webp" }
     ];
 
-    // Liste des tags disponibles
-    const TAGS_LIST = ["Farm", "Donjon", "Mêlée", "Distance", "Zone"; "Succès", "Songes", "PL"];
+    const TAGS_LIST = ["Farm", "Donjon", "Mêlée", "Distance", "Zone"];
 
     let currentTeam = [];   
     const MAX_SLOTS = 8;
     const DEFAULT_SLOTS = 4;
     let savedCompositions = [];
-    
-    // Tags sélectionnés pour la composition en cours de création
     let selectedTags = [];
-    
-    // Filtre actif actuellement
     let currentFilterTag = "all";
 
-    // Éléments DOM
     const slotsContainer = document.getElementById('slotsContainer');
     const classGridContainer = document.getElementById('classGridContainer');
     const resetBtn = document.getElementById('resetTeamBtn');
@@ -576,16 +559,14 @@
     const tagSelector = document.getElementById('tagSelector');
     const filterTagSelect = document.getElementById('filterTagSelect');
 
-    // --- Gestion des tags (UI) ---
     function renderTagSelector() {
-        // Nettoyer les boutons existants (en gardant le label "Tags :")
         const label = tagSelector.querySelector('span');
         tagSelector.innerHTML = '';
         tagSelector.appendChild(label);
 
         TAGS_LIST.forEach(tag => {
             const btn = document.createElement('button');
-            btn.className = `tag-btn ${selectedTags.includes(tag) ? 'active' : ''}`;
+            btn.className = 'tag-btn ' + (selectedTags.includes(tag) ? 'active' : '');
             btn.textContent = tag;
             btn.onclick = () => {
                 if (selectedTags.includes(tag)) {
@@ -593,13 +574,12 @@
                 } else {
                     selectedTags.push(tag);
                 }
-                renderTagSelector(); // Mettre à jour l'UI
+                renderTagSelector();
             };
             tagSelector.appendChild(btn);
         });
     }
 
-    // Initialisation du menu déroulant de filtre
     function renderFilterSelect() {
         filterTagSelect.innerHTML = '<option value="all">Toutes les compositions</option>';
         TAGS_LIST.forEach(tag => {
@@ -610,10 +590,9 @@
         });
     }
 
-    // --- Logique principale ---
     function updateSlotCounterUI() {
         if (slotCounterBadge) {
-            slotCounterBadge.innerText = `${currentTeam.length}/${MAX_SLOTS} slots`;
+            slotCounterBadge.innerText = currentTeam.length + "/" + MAX_SLOTS + " slots";
         }
         if (addSlotBtn) {
             addSlotBtn.disabled = (currentTeam.length >= MAX_SLOTS);
@@ -656,7 +635,7 @@
                 id: Date.now(),
                 name: "Team départ",
                 teamData: new Array(DEFAULT_SLOTS).fill(null),
-                tags: [] // Initialiser le tableau de tags
+                tags: []
             });
             persistCompositions();
         }
@@ -703,7 +682,7 @@
                         const classObj = JSON.parse(classDataRaw);
                         if (classObj && classObj.name && classObj.img) {
                             if (currentTeam[targetIdx] !== null) {
-                                if (!confirm(`Remplacer ${currentTeam[targetIdx].name} par ${classObj.name} ?`)) return;
+                                if (!confirm("Remplacer " + currentTeam[targetIdx].name + " par " + classObj.name + " ?")) return;
                             }
                             currentTeam[targetIdx] = { ...classObj };
                             updateTeamAndPersist();
@@ -714,7 +693,7 @@
             
             const slotNumber = document.createElement('div');
             slotNumber.className = 'slot-number';
-            slotNumber.innerText = `${i+1}`;
+            slotNumber.innerText = "" + (i + 1);
             
             const slotContent = document.createElement('div');
             slotContent.className = 'slot-content';
@@ -773,7 +752,7 @@
     
     function addSlot() {
         if (currentTeam.length >= MAX_SLOTS) {
-            alert(`Maximum ${MAX_SLOTS} slots atteint !`);
+            alert("Maximum " + MAX_SLOTS + " slots atteint !");
             return;
         }
         currentTeam.push(null);
@@ -792,7 +771,6 @@
     function renderCompositionsList() {
         if (!compListContainer) return;
         
-        // Filtrer les compositions selon le tag sélectionné
         const filteredComps = savedCompositions.filter(comp => {
             if (currentFilterTag === "all") return true;
             return comp.tags && comp.tags.includes(currentFilterTag);
@@ -808,7 +786,6 @@
             const compDiv = document.createElement('div');
             compDiv.className = 'comp-item';
             
-            // Contenu de la composition (nom + tags)
             const contentDiv = document.createElement('div');
             contentDiv.className = 'comp-content';
             
@@ -817,10 +794,12 @@
             
             const nameSpan = document.createElement('div');
             nameSpan.className = 'comp-name';
-            nameSpan.innerHTML = `<i class="fas fa-shield-halved"></i> <strong>${escapeHtml(comp.name)}</strong> <span style="font-size:0.7rem; color:#c9a03d;">(${nonEmptyCount}/${slotCount} persos)</span>`;
+            
+            // CORRECTION ICI : utilisation de la concaténation classique
+            nameSpan.innerHTML = '<i class="fas fa-shield-halved"></i> <strong>' + escapeHtml(comp.name) + '</strong> <span style="font-size:0.7rem; color:#c9a03d;">(' + nonEmptyCount + '/' + slotCount + ' persos)</span>';
+            
             contentDiv.appendChild(nameSpan);
             
-            // Affichage des tags s'ils existent
             if (comp.tags && comp.tags.length > 0) {
                 const tagsDiv = document.createElement('div');
                 tagsDiv.className = 'comp-tags';
@@ -833,7 +812,6 @@
                 contentDiv.appendChild(tagsDiv);
             }
             
-            // Boutons d'action
             const actions = document.createElement('div');
             actions.className = 'comp-actions';
             
@@ -874,12 +852,12 @@
         
         const existing = savedCompositions.find(c => c.name.toLowerCase() === compName.toLowerCase());
         if (existing) {
-            if (confirm(`Une composition nommée "${compName}" existe déjà. Voulez-vous la remplacer ?`)) {
+            if (confirm('Une composition nommée "' + compName + '" existe déjà. Voulez-vous la remplacer ?')) {
                 existing.teamData = JSON.parse(JSON.stringify(currentTeam));
-                existing.tags = [...selectedTags]; // Mise à jour des tags
+                existing.tags = [...selectedTags];
                 persistCompositions();
                 renderCompositionsList();
-                alert(`Composition "${compName}" mise à jour !`);
+                alert('Composition "' + compName + '" mise à jour !');
                 compNameInput.value = "";
                 selectedTags = [];
                 renderTagSelector();
@@ -897,9 +875,8 @@
         savedCompositions.push(newComp);
         persistCompositions();
         renderCompositionsList();
-        alert(`Composition "${compName}" sauvegardée !`);
+        alert('Composition "' + compName + '" sauvegardée !');
         
-        // Réinitialiser le formulaire
         compNameInput.value = "";
         selectedTags = [];
         renderTagSelector();
@@ -908,7 +885,7 @@
     function loadComposition(compId) {
         const comp = savedCompositions.find(c => c.id === compId);
         if (comp) {
-            if (confirm(`Charger "${comp.name}" ? L'équipe actuelle sera remplacée.`)) {
+            if (confirm('Charger "' + comp.name + '" ? L\'équipe actuelle sera remplacée.')) {
                 const loadedTeam = JSON.parse(JSON.stringify(comp.teamData));
                 if (loadedTeam.length !== currentTeam.length) {
                     if (loadedTeam.length > MAX_SLOTS) {
@@ -927,19 +904,19 @@
     function overwriteComposition(compId) {
         const comp = savedCompositions.find(c => c.id === compId);
         if (comp) {
-            if (confirm(`Écraser "${comp.name}" par l'équipe actuelle ?`)) {
+            if (confirm('Écraser "' + comp.name + '" par l\'équipe actuelle ?')) {
                 comp.teamData = JSON.parse(JSON.stringify(currentTeam));
-                comp.tags = [...selectedTags]; // Mise à jour des tags avec ceux sélectionnés
+                comp.tags = [...selectedTags];
                 persistCompositions();
                 renderCompositionsList();
-                alert(`Composition "${comp.name}" mise à jour !`);
+                alert('Composition "' + comp.name + '" mise à jour !');
             }
         }
     }
     
     function deleteComposition(compId) {
         const comp = savedCompositions.find(c => c.id === compId);
-        if (comp && confirm(`Supprimer définitivement "${comp.name}" ?`)) {
+        if (comp && confirm('Supprimer définitivement "' + comp.name + '" ?')) {
             savedCompositions = savedCompositions.filter(c => c.id !== compId);
             persistCompositions();
             renderCompositionsList();
@@ -1003,11 +980,9 @@
         loadCompositionsFromStorage();
         renderTeamSlots();
         
-        // Initialiser l'interface des tags et du filtre
         renderTagSelector();
         renderFilterSelect();
         
-        // Événements
         addSlotBtn.addEventListener('click', addSlot);
         resetBtn.addEventListener('click', resetTeam);
         saveCompBtn.addEventListener('click', saveCurrentComposition);
@@ -1017,7 +992,6 @@
             if (e.key === 'Enter') saveCurrentComposition();
         });
         
-        // Écouter les changements sur le filtre
         filterTagSelect.addEventListener('change', (e) => {
             currentFilterTag = e.target.value;
             renderCompositionsList();
