@@ -404,7 +404,6 @@
             padding-right: 4px;
         }
         
-        /* --- CORRECTION DE LA MISE EN PAGE DES COMPOSITIONS --- */
         .comp-item {
             background: #131b2c;
             border-radius: 16px;
@@ -431,14 +430,13 @@
             white-space: nowrap;
         }
         
-        /* Conteneur pour les images, prend tout l'espace disponible */
         .comp-visuals {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
             align-items: center;
             flex: 1;
-            justify-content: flex-end; /* Aligne vers la droite */
+            justify-content: flex-end;
             padding-right: 15px;
         }
         
@@ -495,6 +493,17 @@
             padding: 4px 12px;
             border-radius: 30px;
             margin-left: 8px;
+        }
+        
+        /* NOUVEAU : petit badge pour les boss sélectionnés */
+        .selected-bosses-badge {
+            font-size: 0.75rem;
+            background: #4b5568;
+            color: #eef2ff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+            display: inline-block;
         }
     </style>
 </head>
@@ -570,7 +579,7 @@
             </div>
             <div class="class-grid" id="efficiencyGridContainer"></div>
             <div style="margin-top: 18px; font-size:0.75rem; text-align:center; color:#7c8aa8;">
-                <i class="fas fa-arrows-alt"></i> Drag & drop vers l'équipe
+                <i class="fas fa-mouse-pointer"></i> Cliquez pour sélectionner les boss
             </div>
         </div>
     </div>
@@ -640,6 +649,7 @@
     const TAGS_LIST = ["Farm", "Donjon", "Mêlée", "Distance", "Zone", "Succès", "Songes"];
 
     let currentTeam = [];   
+    let selectedBosses = []; // NOUVEAU : tableau pour stocker les boss sélectionnés
     const MAX_SLOTS = 8;
     const DEFAULT_SLOTS = 4;
     let savedCompositions = [];
@@ -735,7 +745,8 @@
                 id: Date.now(),
                 name: "Team départ",
                 teamData: new Array(DEFAULT_SLOTS).fill(null),
-                tags: []
+                tags: [],
+                bosses: [] // Initialisation du tableau de boss
             });
             persistCompositions();
         }
@@ -864,6 +875,7 @@
             for (let i = 0; i < currentTeam.length; i++) {
                 currentTeam[i] = null;
             }
+            selectedBosses = []; // Réinitialiser les boss sélectionnés
             updateTeamAndPersist();
         }
     }
@@ -911,10 +923,11 @@
                 contentDiv.appendChild(tagsDiv);
             }
             
-            // --- PARTIE DROITE : MINIATURES ---
+            // --- PARTIE DROITE : MINIATURES (Classes + Boss) ---
             const visualsDiv = document.createElement('div');
             visualsDiv.className = 'comp-visuals';
             
+            // 1. Ajouter les miniatures des classes (issues des slots)
             comp.teamData.forEach(perso => {
                 if (perso && perso.img) {
                     const miniImg = document.createElement('img');
@@ -925,6 +938,21 @@
                     visualsDiv.appendChild(miniImg);
                 }
             });
+            
+            // 2. Ajouter les miniatures des boss sélectionnés
+            if (comp.bosses && comp.bosses.length > 0) {
+                comp.bosses.forEach(boss => {
+                    if (boss && boss.img) {
+                        const miniImg = document.createElement('img');
+                        miniImg.className = 'comp-mini-img';
+                        miniImg.src = boss.img;
+                        miniImg.alt = boss.name;
+                        miniImg.title = boss.name;
+                        miniImg.style.borderColor = '#c9a03d'; // Petite bordure dorée pour différencier les boss
+                        visualsDiv.appendChild(miniImg);
+                    }
+                });
+            }
             
             // --- BOUTONS D'ACTION ---
             const actions = document.createElement('div');
@@ -973,11 +1001,13 @@
             if (confirm('Une composition nommée "' + compName + '" existe déjà. Voulez-vous la remplacer ?')) {
                 existing.teamData = JSON.parse(JSON.stringify(currentTeam));
                 existing.tags = [...selectedTags];
+                existing.bosses = JSON.parse(JSON.stringify(selectedBosses)); // Sauvegarde des boss
                 persistCompositions();
                 renderCompositionsList();
                 alert('Composition "' + compName + '" mise à jour !');
                 compNameInput.value = "";
                 selectedTags = [];
+                selectedBosses = []; // Réinitialiser les boss après sauvegarde
                 renderTagSelector();
                 return;
             } else return;
@@ -987,7 +1017,8 @@
             id: Date.now(),
             name: compName,
             teamData: JSON.parse(JSON.stringify(currentTeam)),
-            tags: [...selectedTags]
+            tags: [...selectedTags],
+            bosses: JSON.parse(JSON.stringify(selectedBosses)) // Sauvegarde des boss
         };
         
         savedCompositions.push(newComp);
@@ -997,6 +1028,7 @@
         
         compNameInput.value = "";
         selectedTags = [];
+        selectedBosses = []; // Réinitialiser les boss après sauvegarde
         renderTagSelector();
     }
     
@@ -1014,6 +1046,22 @@
                 } else {
                     for (let i = 0; i < currentTeam.length; i++) currentTeam[i] = loadedTeam[i];
                 }
+                
+                // Charger les boss associés à la composition
+                selectedBosses = comp.bosses ? JSON.parse(JSON.stringify(comp.bosses)) : [];
+                
+                // Mettre à jour les cartes des boss dans le panneau de droite pour refléter la sélection
+                const bossCards = efficiencyGridContainer.querySelectorAll('.class-card');
+                bossCards.forEach(card => {
+                    const cardName = card.querySelector('.class-name').innerText;
+                    const isSelected = selectedBosses.some(b => b.name === cardName);
+                    if (isSelected) {
+                        card.classList.add('selected');
+                    } else {
+                        card.classList.remove('selected');
+                    }
+                });
+                
                 updateTeamAndPersist();
             }
         }
@@ -1025,6 +1073,7 @@
             if (confirm('Écraser "' + comp.name + '" par l\'équipe actuelle ?')) {
                 comp.teamData = JSON.parse(JSON.stringify(currentTeam));
                 comp.tags = [...selectedTags];
+                comp.bosses = JSON.parse(JSON.stringify(selectedBosses)); // Écraser les boss
                 persistCompositions();
                 renderCompositionsList();
                 alert('Composition "' + comp.name + '" mise à jour !');
@@ -1075,8 +1124,25 @@
             });
             card.addEventListener('dragend', () => card.style.opacity = '1');
             
+            // Gestion du clic pour sélectionner/désélectionner
             card.addEventListener('click', () => {
                 card.classList.toggle('selected');
+                
+                // Si on est dans le panneau d'efficacité (droite), on met à jour selectedBosses
+                if (container.id === 'efficiencyGridContainer') {
+                    const isSelected = card.classList.contains('selected');
+                    const bossData = { id: cls.id, name: cls.name, img: fullImgSrc };
+                    
+                    if (isSelected) {
+                        // Vérifier s'il n'est pas déjà dans la liste
+                        if (!selectedBosses.some(b => b.id === cls.id)) {
+                            selectedBosses.push(bossData);
+                        }
+                    } else {
+                        // Retirer de la liste
+                        selectedBosses = selectedBosses.filter(b => b.id !== cls.id);
+                    }
+                }
             });
             
             const imgEl = document.createElement('img');
