@@ -108,9 +108,9 @@
             border-radius: 24px;
             padding: 12px 6px;
             text-align: center;
-            cursor: pointer; /* Changé de grab à pointer pour indiquer le clic */
+            cursor: pointer;
             transition: all 0.2s ease;
-            border: 2px solid #334155; /* Bordure normale */
+            border: 2px solid #334155;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -122,7 +122,7 @@
         .class-card:hover {
             transform: translateY(-4px);
             background: #2d3a55b3;
-            border-color: #f5bc4e; /* Survol */
+            border-color: #f5bc4e;
         }
 
         /* Bordure dorée quand la case est sélectionnée */
@@ -138,7 +138,7 @@
             object-fit: contain;
             margin-bottom: 8px;
             filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4));
-            pointer-events: none; /* L'image ne bloque pas le drag */
+            pointer-events: none;
         }
 
         .class-name { 
@@ -148,7 +148,7 @@
             display: inline-block; 
             padding: 4px 10px; 
             border-radius: 40px; 
-            pointer-events: none; /* Le texte ne bloque pas le drag */
+            pointer-events: none;
         }
 
         /* --- Panneau Équipe --- */
@@ -551,26 +551,32 @@
 </div>
 
 <script>
+    // --- Configuration des chemins d'images ---
+    // Modifie ces variables pour pointer vers tes différents dossiers d'images
+    const IMG_PATH_LIBRARY = "img/";           // Dossier pour la bibliothèque (gauche)
+    const IMG_PATH_EFFICIENCY = "img_eff/";    // Dossier pour l'efficacité (droite) - À MODIFIER selon ton dossier
+
+    // Liste des classes (on ne met que le nom du fichier image, le chemin sera ajouté dynamiquement)
     const CLASSES_LIST = [
-        { id: "cra", name: "Cra", img: "img/Cra_Logo.webp" },
-        { id: "iop", name: "Iop", img: "img/Iop_Logo.webp" },
-        { id: "ecaflip", name: "Ecaflip", img: "img/Ecaflip_Logo.webp" },
-        { id: "eniripsa", name: "Eniripsa", img: "img/Eniripsa_Logo.webp" },
-        { id: "sacrieur", name: "Sacrieur", img: "img/Sacrieur_Logo.webp" },
-        { id: "pandawa", name: "Pandawa", img: "img/Pandawa_Logo.webp" },
-        { id: "enutrof", name: "Enutrof", img: "img/Enutrof_Logo.webp" },
-        { id: "sram", name: "Sram", img: "img/Sram_Logo.webp" },
-        { id: "xelor", name: "Xélor", img: "img/Xelor_Logo.webp" },
-        { id: "osamodas", name: "Osamodas", img: "img/Osamodas_Logo.webp" },
-        { id: "feca", name: "Féca", img: "img/Feca_Logo.webp" },
-        { id: "forgelance", name: "Forgelance", img: "img/Forgelance_Logo.webp" },
-        { id: "roublard", name: "Roublard", img: "img/Roublard_Logo.webp" },
-        { id: "zobal", name: "Zobal", img: "img/Zobal_Logo.webp" },
-        { id: "steamer", name: "Steamer", img: "img/Steamer_Logo.webp" },
-        { id: "eliotrope", name: "Eliotrope", img: "img/Eliotrope_Logo.webp" },
-        { id: "huppermage", name: "Huppermage", img: "img/Huppermage_Logo.webp" },
-        { id: "ouginak", name: "Ouginak", img: "img/Ouginak_Logo.webp" },
-        { id: "sadida", name: "Sadida", img: "img/Sadida_Logo.webp" }
+        { id: "cra", name: "Cra", imgName: "Cra_Logo.webp" },
+        { id: "iop", name: "Iop", imgName: "Iop_Logo.webp" },
+        { id: "ecaflip", name: "Ecaflip", imgName: "Ecaflip_Logo.webp" },
+        { id: "eniripsa", name: "Eniripsa", imgName: "Eniripsa_Logo.webp" },
+        { id: "sacrieur", name: "Sacrieur", imgName: "Sacrieur_Logo.webp" },
+        { id: "pandawa", name: "Pandawa", imgName: "Pandawa_Logo.webp" },
+        { id: "enutrof", name: "Enutrof", imgName: "Enutrof_Logo.webp" },
+        { id: "sram", name: "Sram", imgName: "Sram_Logo.webp" },
+        { id: "xelor", name: "Xélor", imgName: "Xelor_Logo.webp" },
+        { id: "osamodas", name: "Osamodas", imgName: "Osamodas_Logo.webp" },
+        { id: "feca", name: "Féca", imgName: "Feca_Logo.webp" },
+        { id: "forgelance", name: "Forgelance", imgName: "Forgelance_Logo.webp" },
+        { id: "roublard", name: "Roublard", imgName: "Roublard_Logo.webp" },
+        { id: "zobal", name: "Zobal", imgName: "Zobal_Logo.webp" },
+        { id: "steamer", name: "Steamer", imgName: "Steamer_Logo.webp" },
+        { id: "eliotrope", name: "Eliotrope", imgName: "Eliotrope_Logo.webp" },
+        { id: "huppermage", name: "Huppermage", imgName: "Huppermage_Logo.webp" },
+        { id: "ouginak", name: "Ouginak", imgName: "Ouginak_Logo.webp" },
+        { id: "sadida", name: "Sadida", imgName: "Sadida_Logo.webp" }
     ];
 
     const TAGS_LIST = ["Farm", "Donjon", "Mêlée", "Distance", "Zone", "Succès", "Songes"];
@@ -974,14 +980,19 @@
         });
     }
     
-    // Fonction pour générer une grille de classes avec gestion du clic (sélection)
-    function generateClassGrid(container, classes) {
+    // Fonction pour générer une grille de classes avec gestion du clic (sélection) et chemin d'image spécifique
+    function generateClassGrid(container, classes, imgPath) {
         container.innerHTML = '';
         classes.forEach(cls => {
             const card = document.createElement('div');
             card.className = 'class-card';
             card.setAttribute('draggable', 'true');
-            const dragPayload = JSON.stringify({ id: cls.id, name: cls.name, img: cls.img });
+            
+            // On construit l'URL de l'image en fonction du chemin passé en paramètre
+            const fullImgSrc = imgPath + cls.imgName;
+            
+            // On construit la payload pour le drag & drop
+            const dragPayload = JSON.stringify({ id: cls.id, name: cls.name, img: fullImgSrc });
             
             card.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('text/plain', dragPayload);
@@ -997,9 +1008,14 @@
             
             const imgEl = document.createElement('img');
             imgEl.className = 'class-img';
-            imgEl.src = cls.img;
+            imgEl.src = fullImgSrc;
             imgEl.alt = cls.name;
             imgEl.loading = 'lazy';
+            
+            // Si l'image ne charge pas (car pas encore dans le dossier), on met un fallback
+            imgEl.onerror = function() {
+                this.src = IMG_PATH_LIBRARY + cls.imgName; // Fallback vers le dossier de base
+            };
             
             const nameDiv = document.createElement('div');
             nameDiv.className = 'class-name';
@@ -1012,8 +1028,11 @@
     }
 
     function buildClassLibrary() {
-        generateClassGrid(classGridContainer, CLASSES_LIST);
-        generateClassGrid(efficiencyGridContainer, CLASSES_LIST); 
+        // Panneau de gauche : utilise le chemin IMG_PATH_LIBRARY
+        generateClassGrid(classGridContainer, CLASSES_LIST, IMG_PATH_LIBRARY);
+        
+        // Panneau de droite : utilise le chemin IMG_PATH_EFFICIENCY
+        generateClassGrid(efficiencyGridContainer, CLASSES_LIST, IMG_PATH_EFFICIENCY); 
     }
     
     document.body.addEventListener('dragover', (e) => e.preventDefault());
