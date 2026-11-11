@@ -30,7 +30,7 @@
         }
 
         .app-container {
-            max-width: 1700px; /* Augmenté pour faire tenir les 3 colonnes confortablement */
+            max-width: 1700px;
             margin: 0 auto;
         }
 
@@ -108,19 +108,28 @@
             border-radius: 24px;
             padding: 12px 6px;
             text-align: center;
-            cursor: grab;
+            cursor: pointer; /* Changé de grab à pointer pour indiquer le clic */
             transition: all 0.2s ease;
-            border: 1px solid #334155;
+            border: 2px solid #334155; /* Bordure normale */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
-        .class-card:active { cursor: grabbing; }
+        
+        .class-card:active { cursor: pointer; }
+        
         .class-card:hover {
             transform: translateY(-4px);
             background: #2d3a55b3;
+            border-color: #f5bc4e; /* Survol */
+        }
+
+        /* Bordure dorée quand la case est sélectionnée */
+        .class-card.selected {
             border-color: #f5bc4e;
+            box-shadow: 0 0 15px rgba(245, 188, 78, 0.4);
+            background: #2d3a55b3;
         }
         
         .class-img {
@@ -129,7 +138,7 @@
             object-fit: contain;
             margin-bottom: 8px;
             filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.4));
-            pointer-events: none;
+            pointer-events: none; /* L'image ne bloque pas le drag */
         }
 
         .class-name { 
@@ -139,6 +148,7 @@
             display: inline-block; 
             padding: 4px 10px; 
             border-radius: 40px; 
+            pointer-events: none; /* Le texte ne bloque pas le drag */
         }
 
         /* --- Panneau Équipe --- */
@@ -459,12 +469,6 @@
             border-radius: 30px;
             margin-left: 8px;
         }
-
-        /* Style spécifique pour les cartes du panneau d'efficacité */
-        .efficiency-panel .class-card.highlighted {
-            border-color: #f5bc4e;
-            box-shadow: 0 0 15px rgba(245, 188, 78, 0.4);
-        }
     </style>
 </head>
 <body>
@@ -569,7 +573,6 @@
         { id: "sadida", name: "Sadida", img: "img/Sadida_Logo.webp" }
     ];
 
-    // Ajout de "Succès" et "Songes"
     const TAGS_LIST = ["Farm", "Donjon", "Mêlée", "Distance", "Zone", "Succès", "Songes"];
 
     let currentTeam = [];   
@@ -971,7 +974,7 @@
         });
     }
     
-    // Fonction pour générer une grille de classes
+    // Fonction pour générer une grille de classes avec gestion du clic (sélection)
     function generateClassGrid(container, classes) {
         container.innerHTML = '';
         classes.forEach(cls => {
@@ -986,6 +989,11 @@
                 card.style.opacity = '0.5';
             });
             card.addEventListener('dragend', () => card.style.opacity = '1');
+            
+            // Événement de clic pour sélectionner/désélectionner
+            card.addEventListener('click', () => {
+                card.classList.toggle('selected');
+            });
             
             const imgEl = document.createElement('img');
             imgEl.className = 'class-img';
@@ -1005,21 +1013,7 @@
 
     function buildClassLibrary() {
         generateClassGrid(classGridContainer, CLASSES_LIST);
-        
-        // On génère la même liste pour le panneau d'efficacité pour l'instant
         generateClassGrid(efficiencyGridContainer, CLASSES_LIST); 
-        
-        // Optionnel : Ajouter un contour doré à une classe spécifique pour reproduire la photo
-        // Par exemple, si tu veux surligner le Cra et l'Osamodas :
-        setTimeout(() => {
-            const cards = efficiencyGridContainer.querySelectorAll('.class-card');
-            cards.forEach(card => {
-                const name = card.querySelector('.class-name').innerText;
-                if (name === 'Cra' || name === 'Osamodas') {
-                    card.classList.add('highlighted');
-                }
-            });
-        }, 100);
     }
     
     document.body.addEventListener('dragover', (e) => e.preventDefault());
