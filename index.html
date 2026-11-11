@@ -404,14 +404,14 @@
             padding-right: 4px;
         }
         
-        /* --- MODIFICATIONS POUR LES MINIATURES A DROITE --- */
+        /* --- CORRECTION DE LA MISE EN PAGE DES COMPOSITIONS --- */
         .comp-item {
             background: #131b2c;
             border-radius: 16px;
             padding: 12px 16px;
             display: flex;
             justify-content: space-between;
-            align-items: center; /* Centré verticalement */
+            align-items: center;
             border-left: 4px solid #c9a03d;
             gap: 12px;
         }
@@ -420,8 +420,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            flex: 1;
-            min-width: 120px;
+            flex: 0 1 auto; /* Prend la place nécessaire mais peut rétrécir */
         }
 
         .comp-name { 
@@ -429,16 +428,18 @@
             display: flex; 
             align-items: center; 
             gap: 8px; 
+            white-space: nowrap; /* Empêche le titre de passer à la ligne */
         }
         
-        /* Conteneur pour les images à droite */
+        /* Conteneur pour les images, prend tout l'espace disponible */
         .comp-visuals {
             display: flex;
             flex-wrap: wrap;
             gap: 4px;
-            justify-content: flex-end; /* Aligne les images vers la droite */
-            max-width: 180px; /* Limite la largeur pour ne pas écraser les boutons */
-            flex-shrink: 0;
+            justify-content: flex-end;
+            flex: 1; /* Prend tout l'espace restant au milieu */
+            margin-left: auto; /* Pousse les images vers la droite */
+            padding-right: 12px;
         }
         
         .comp-mini-img {
@@ -471,6 +472,7 @@
             display: flex; 
             gap: 8px; 
             flex-shrink: 0; 
+            margin-left: auto; /* S'assure que les boutons restent à droite */
         }
         
         .icon-btn {
