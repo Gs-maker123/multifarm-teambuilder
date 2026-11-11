@@ -404,7 +404,7 @@
             padding-right: 4px;
         }
         
-        /* Modification de comp-item pour accueillir les 3 blocs */
+        /* --- MODIFICATIONS POUR LES MINIATURES A DROITE --- */
         .comp-item {
             background: #131b2c;
             border-radius: 16px;
@@ -420,8 +420,8 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            flex: 1; /* Prend l'espace disponible à gauche */
-            min-width: 150px; /* Évite que ça se tasse trop */
+            flex: 1;
+            min-width: 120px;
         }
 
         .comp-name { 
@@ -431,13 +431,14 @@
             gap: 8px; 
         }
         
-        /* --- NOUVEAU : Conteneur pour les images à droite --- */
+        /* Conteneur pour les images à droite */
         .comp-visuals {
             display: flex;
             flex-wrap: wrap;
             gap: 4px;
             justify-content: flex-end; /* Aligne les images vers la droite */
             max-width: 180px; /* Limite la largeur pour ne pas écraser les boutons */
+            flex-shrink: 0;
         }
         
         .comp-mini-img {
@@ -466,7 +467,11 @@
             letter-spacing: 0.5px;
         }
 
-        .comp-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .comp-actions { 
+            display: flex; 
+            gap: 8px; 
+            flex-shrink: 0; 
+        }
         
         .icon-btn {
             background: none;
@@ -946,8 +951,8 @@
             
             // --- ASSEMBLAGE ---
             compDiv.appendChild(contentDiv);
-            compDiv.appendChild(visualsDiv); // Les images au milieu/droite
-            compDiv.appendChild(actions);    // Les boutons tout à droite
+            compDiv.appendChild(visualsDiv);
+            compDiv.appendChild(actions);
             
             compListContainer.appendChild(compDiv);
         });
