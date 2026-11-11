@@ -430,20 +430,27 @@
             white-space: nowrap;
         }
         
-        /* --- CORRECTION DE L'AFFICHAGE DES MINIATURES --- */
+        /* --- ORGANISATION DES MINIATURES EN DEUX LIGNES --- */
         .comp-visuals {
             display: flex;
+            flex-direction: column; /* Organise en colonnes (lignes de haut en bas) */
+            align-items: flex-end; /* Aligne tout à droite */
+            gap: 6px;
+            flex: 1;
+            padding-right: 20px;
+        }
+        
+        /* Ligne contenant les images */
+        .comp-visuals-row {
+            display: flex;
             flex-wrap: wrap;
-            gap: 8px; /* Espace entre les images */
-            align-items: center;
-            flex: 1; /* Prend tout l'espace disponible entre le texte et les boutons */
-            justify-content: flex-end; /* Aligne les images vers la droite, près des boutons */
-            padding-right: 20px; /* Marge de sécurité avant les boutons */
+            gap: 6px;
+            justify-content: flex-end;
         }
         
         .comp-mini-img {
-            width: 45px; /* Taille augmentée pour bien voir */
-            height: 45px;
+            width: 42px;
+            height: 42px;
             object-fit: contain;
             background: #0f172a;
             border-radius: 8px;
@@ -451,13 +458,15 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             transition: transform 0.2s;
         }
+        
         .comp-mini-img:hover {
             transform: scale(1.1);
             border-color: #c9a03d;
         }
-        /* Petite bordure dorée spécifique aux boss */
+
+        /* Bordure dorée spécifique aux boss */
         .comp-mini-img.boss {
-            border-color: #c9a03d;
+            border: 2px solid #c9a03d;
         }
 
         .comp-tags {
@@ -648,7 +657,7 @@
     const TAGS_LIST = ["Farm", "Donjon", "Mêlée", "Distance", "Zone", "Succès", "Songes"];
 
     let currentTeam = [];   
-    let selectedBosses = []; // Tableau pour stocker les boss sélectionnés
+    let selectedBosses = []; 
     const MAX_SLOTS = 8;
     const DEFAULT_SLOTS = 4;
     let savedCompositions = [];
@@ -875,7 +884,6 @@
                 currentTeam[i] = null;
             }
             selectedBosses = [];
-            // Désélectionner visuellement tous les boss
             document.querySelectorAll('#efficiencyGridContainer .class-card').forEach(c => c.classList.remove('selected'));
             updateTeamAndPersist();
         }
@@ -924,11 +932,13 @@
                 contentDiv.appendChild(tagsDiv);
             }
             
-            // --- PARTIE DROITE : MINIATURES (Classes + Boss) ---
+            // --- PARTIE DROITE : MINIATURES (Classes puis Boss) ---
             const visualsDiv = document.createElement('div');
             visualsDiv.className = 'comp-visuals';
             
-            // 1. Ajouter les miniatures des classes (issues des slots)
+            // Ligne 1 : les classes (issues des slots)
+            const classesRow = document.createElement('div');
+            classesRow.className = 'comp-visuals-row';
             comp.teamData.forEach(perso => {
                 if (perso && perso.img) {
                     const miniImg = document.createElement('img');
@@ -936,22 +946,26 @@
                     miniImg.src = perso.img;
                     miniImg.alt = perso.name;
                     miniImg.title = perso.name;
-                    visualsDiv.appendChild(miniImg);
+                    classesRow.appendChild(miniImg);
                 }
             });
+            visualsDiv.appendChild(classesRow);
             
-            // 2. Ajouter les miniatures des boss sélectionnés
+            // Ligne 2 : les boss (sélectionnés via le panneau de droite)
             if (comp.bosses && comp.bosses.length > 0) {
+                const bossesRow = document.createElement('div');
+                bossesRow.className = 'comp-visuals-row';
                 comp.bosses.forEach(boss => {
                     if (boss && boss.img) {
                         const miniImg = document.createElement('img');
-                        miniImg.className = 'comp-mini-img boss'; // Ajout de la classe "boss" pour la bordure dorée
+                        miniImg.className = 'comp-mini-img boss';
                         miniImg.src = boss.img;
                         miniImg.alt = boss.name;
                         miniImg.title = boss.name;
-                        visualsDiv.appendChild(miniImg);
+                        bossesRow.appendChild(miniImg);
                     }
                 });
+                visualsDiv.appendChild(bossesRow);
             }
             
             // --- BOUTONS D'ACTION ---
@@ -1049,10 +1063,8 @@
                     for (let i = 0; i < currentTeam.length; i++) currentTeam[i] = loadedTeam[i];
                 }
                 
-                // Charger les boss associés à la composition
                 selectedBosses = comp.bosses ? JSON.parse(JSON.stringify(comp.bosses)) : [];
                 
-                // Mettre à jour les cartes des boss dans le panneau de droite pour refléter la sélection
                 const bossCards = efficiencyGridContainer.querySelectorAll('.class-card');
                 bossCards.forEach(card => {
                     const cardName = card.querySelector('.class-name').innerText;
@@ -1126,11 +1138,9 @@
             });
             card.addEventListener('dragend', () => card.style.opacity = '1');
             
-            // Gestion du clic pour sélectionner/désélectionner
             card.addEventListener('click', () => {
                 card.classList.toggle('selected');
                 
-                // Si on est dans le panneau d'efficacité (droite), on met à jour selectedBosses
                 if (container.id === 'efficiencyGridContainer') {
                     const isSelected = card.classList.contains('selected');
                     const bossData = { id: cls.id, name: cls.name, img: fullImgSrc };
