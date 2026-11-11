@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Dofus Team Builder - Slots dynamiques (max 8)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #11161f 0%, #0c0f17 100%);
+            min-height: 100vh;
+            color: #eef2ff;
+            padding: 24px 20px;
+        }
+
+        .app-container {
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .header h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #F9E0A0, #C9A03D);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .header p {
+            color: #9aa5c1;
+            margin-top: 6px;
+        }
+
+        .builder-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+        }
+
+        /* Panneau gauche */
+        .library-panel {
+            flex: 1.2;
+            min-width: 260px;
+            background: rgba(18, 25, 40, 0.65);
+            backdrop-filter: blur(8px);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 215, 120, 0.25);
+            padding: 20px 16px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
+        }
+
+        .library-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid rgba(201, 160, 61, 0.5);
+            padding-bottom: 10px;
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 14px;
+        }
+
+        .class-card {
+            background: #1e293bb3;
+            border-radius: 24px;
+            padding: 12px 6px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.2s ease;
+            border: 1px solid #334155;
+        }
+        .class-card:active { cursor: grabbing; }
+        .class-card:hover {
+            transform: translateY(-4px);
+            background: #2d3a55b3;
+            border-color: #f5bc4e;
+        }
+        .class-icon { font-size: 2.2rem; margin-bottom: 8px; }
+        .class-name { font-weight: 600; font-size: 0.85rem; background: #0f172a80; display: inline-block; padding: 4px 10px; border-radius: 40px; }
+
+        /* Panneau équipe */
+        .team-panel {
+            flex: 2;
+            min-width: 380px;
+            background: rgba(10, 16, 28, 0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 32px;
+            border: 1px solid rgba(201, 160, 61, 0.4);
+            padding: 20px;
+        }
+
+        .team-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #3b4259;
+            padding-bottom: 12px;
+        }
+        .team-header h2 { font-size: 1.7rem; display: flex; align-items: center; gap: 10px; }
+        
+        .slot-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .add-slot-btn {
+            background: linear-gradient(135deg, #2a4b3c, #1e3a2f);
+            border: none;
+            color: #c9e0b0;
+            padding: 8px 18px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .add-slot-btn:hover:not(:disabled) {
+            background: #3e6b55;
+            transform: scale(0.96);
+            color: white;
+        }
+        .add-slot-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .reset-btn {
+            background: #2d2f42;
+            border: none;
+            color: #ffbc6e;
+            padding: 8px 18px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .reset-btn:hover { background: #4c3b2c; transform: scale(0.96); }
+
+        /* Slots */
+        .slots-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 24px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+        .team-slot {
+            background: #0f1422cc;
+            border-radius: 28px;
+            border: 2px dashed #3c445e;
+            transition: 0.2s;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            padding: 6px 16px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .team-slot.drag-over {
+            border-color: #f5bc4e;
+            background: #1e2a3ecc;
+        }
+        .slot-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+            width: 50px;
+            text-align: center;
+            color: #c9a03d;
+        }
+        .slot-content { flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .character-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #010a1e6e;
+            padding: 6px 20px;
+            border-radius: 60px;
+            flex: 2;
+            cursor: grab;
+        }
+        .character-info:active { cursor: grabbing; }
+        .char-icon { font-size: 1.6rem; }
+        .char-name { font-size: 1rem; font-weight: 600; }
+        .empty-message { color: #7e8aa8; font-style: italic; display: flex; align-items: center; gap: 10px; }
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #f28b82;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+        }
+        .remove-btn:hover { background: #ff4d4d20; transform: scale(1.1); }
+
+        /* Zone sauvegarde */
+        .save-section {
+            background: #0c1122cc;
+            border-radius: 24px;
+            padding: 16px;
+            margin-top: 12px;
+            border-top: 1px solid #2a3452;
+        }
+        .save-header {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .save-header input {
+            flex: 2;
+            background: #1e293b;
+            border: 1px solid #4b5568;
+            padding: 10px 16px;
+            border-radius: 40px;
+            color: white;
+            outline: none;
+        }
+        .save-header input:focus { border-color: #f5bc4e; }
+        .btn-primary {
+            background: #c9a03d;
+            border: none;
+            color: #0f111a;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary:hover { background: #e0b354; }
+        .btn-secondary {
+            background: #2d3a5e;
+            border: none;
+            color: #eef2ff;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .compositions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        .comp-item {
+            background: #131b2c;
+            border-radius: 20px;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #c9a03d;
+        }
+        .comp-name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .comp-actions { display: flex; gap: 8px; }
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #b9c7db;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 6px;
+            border-radius: 50%;
+        }
+        .icon-btn:hover { color: #f5bc4e; background: #ffffff10; }
+        .danger-btn:hover { color: #ff8a7a; }
+        .slot-counter {
+            font-size: 0.75rem;
+            background: #00000060;
+            padding: 4px 12px;
+            border-radius: 30px;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1><i class="fas fa-dragon"></i> Dofus Team Builder <i class="fas fa-layer-group"></i></h1>
+        <p>Glissez / déposez vos classes | Ajoutez des slots jusqu'à 8 | Sauvegardez vos compositions</p>
+    </div>
+
+    <div class="builder-layout">
+        <!-- Bibliothèque -->
+        <div class="library-panel">
+            <div class="library-title">
+                <i class="fas fa-book-open"></i>
+                <span>Classes DOFUS</span>
+            </div>
+            <div class="class-grid" id="classGridContainer"></div>
+            <div style="margin-top: 18px; font-size:0.75rem; text-align:center;">
+                <i class="fas fa-arrows-alt"></i> Drag & drop vers l'équipe
+            </div>
+        </div>
+
+        <!-- Panneau équipe -->
+        <div class="team-panel">
+            <div class="team-header">
+                <h2><i class="fas fa-users"></i> Mon équipe <span id="slotCounterBadge" class="slot-counter">0/8 slots</span></h2>
+                <div class="slot-controls">
+                    <button id="addSlotBtn" class="add-slot-btn"><i class="fas fa-plus-circle"></i> Ajouter slot</button>
+                    <button id="resetTeamBtn" class="reset-btn"><i class="fas fa-trash-alt"></i> Vider</button>
+                </div>
+            </div>
+            <div class="slots-container" id="slotsContainer"></div>
+            <div style="font-size:0.7rem; margin-bottom: 20px; color:#7c8aa8;">
+                <i class="fas fa-arrows-alt"></i> Déplacez les personnages entre les slots (glisser-déposer)
+            </div>
+
+            <!-- Sauvegarde -->
+            <div class="save-section">
+                <div class="save-header">
+                    <input type="text" id="compNameInput" placeholder="Nom de la composition (ex: Team Donjon)" maxlength="30">
+                    <button id="saveCompBtn" class="btn-primary"><i class="fas fa-save"></i> Sauvegarder</button>
+                </div>
+                <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
+                    <span><i class="fas fa-archive"></i> Mes compositions</span>
+                    <button id="clearAllCompsBtn" class="btn-secondary" style="background:#3a2a2a;"><i class="fas fa-trash-alt"></i> Tout supprimer</button>
+                </div>
+                <div id="compositionsListContainer" class="compositions-list">
+                    <div style="text-align:center; color:#6b7c9e;">Chargement...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // LISTE DES CLASSES DOFUS 
+    // Mise à jour: Masqueraider -> Forgelance | Ajout Sadida | Nouveau picto Eliotrope (fa-rings-wedding)
+    // --------------------------------------------------------------
+    const CLASSES_LIST = [
+        { id: "cra", name: "Cra", icon: "fas fa-bullseye" },
+        { id: "iop", name: "Iop", icon: "fas fa-fist-raised" },
+        { id: "ecaflip", name: "Ecaflip", icon: "fas fa-dice-d6" },
+        { id: "eniripsa", name: "Eniripsa", icon: "fas fa-heartbeat" },
+        { id: "sacrieur", name: "Sacrieur", icon: "fas fa-hand-holding-heart" },
+        { id: "pandawa", name: "Pandawa", icon: "fas fa-wine-bottle" },
+        { id: "enutrof", name: "Enutrof", icon: "fas fa-gem" },
+        { id: "sram", name: "Sram", icon: "fas fa-user-secret" },
+        { id: "xelor", name: "Xélor", icon: "fas fa-hourglass-half" },
+        { id: "osamodas", name: "Osamodas", icon: "fas fa-paw" },
+        { id: "feca", name: "Féca", icon: "fas fa-shield-alt" },
+        { id: "forgelance", name: "Forgelance", icon: "fas fa-fire" },
+        { id: "roublard", name: "Roublard", icon: "fas fa-bomb" },
+        { id: "zobal", name: "Zobal", icon: "fas fa-theater-masks" },
+        { id: "steamer", name: "Steamer", icon: "fas fa-cogs" },
+        // ELIOTROPE : Nouveau picto -> fa-rings-wedding (portail / vortex dimensionnel)
+        { id: "eliotrope", name: "Eliotrope", icon: "fas fa-rings-wedding" },
+        { id: "huppermage", name: "Huppermage", icon: "fas fa-meteor" },
+        { id: "ouginak", name: "Ouginak", icon: "fas fa-dog" },
+        { id: "sadida", name: "Sadida", icon: "fas fa-leaf" }
+    ];
+
+    // Équipe dynamique : on stocke un tableau de longueur variable (min 4, max 8)
+    let currentTeam = [];   // sera initialisé à 4 slots vides
+    const MAX_SLOTS = 8;
+    const DEFAULT_SLOTS = 4;
+
+    // Compositions sauvegardées
+    let savedCompositions = [];
+
+    // Éléments DOM
+    const slotsContainer = document.getElementById('slotsContainer');
+    const classGridContainer = document.getElementById('classGridContainer');
+    const resetBtn = document.getElementById('resetTeamBtn');
+    const addSlotBtn = document.getElementById('addSlotBtn');
+    const saveCompBtn = document.getElementById('saveCompBtn');
+    const compNameInput = document.getElementById('compNameInput');
+    const compListContainer = document.getElementById('compositionsListContainer');
+    const clearAllCompsBtn = document.getElementById('clearAllCompsBtn');
+    const slotCounterBadge = document.getElementById('slotCounterBadge');
+
+    // Helper : mise à jour du compteur UI
+    function updateSlotCounterUI() {
+        if (slotCounterBadge) {
+            slotCounterBadge.innerText = `${currentTeam.length}/${MAX_SLOTS} slots`;
+        }
+        // Désactiver bouton ajout si max atteint
+        if (addSlotBtn) {
+            addSlotBtn.disabled = (currentTeam.length >= MAX_SLOTS);
+        }
+    }
+
+    // Persistance équipe (localStorage)
+    function persistCurrentTeam() {
+        localStorage.setItem('dofus_dynamic_team', JSON.stringify(currentTeam));
+    }
+
+    function loadCurrentTeamFromStorage() {
+        const stored = localStorage.getItem('dofus_dynamic_team');
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length >= 1 && parsed.length <= MAX_SLOTS) {
+                    currentTeam = parsed;
+                    return;
+                }
+            } catch(e) {}
+        }
+        // Valeur par défaut : 4 slots vides
+        currentTeam = new Array(DEFAULT_SLOTS).fill(null);
+        persistCurrentTeam();
+    }
+
+    // Persistance compositions
+    function persistCompositions() {
+        localStorage.setItem('dofus_compositions_dynamic', JSON.stringify(savedCompositions));
+    }
+
+    function loadCompositionsFromStorage() {
+        const stored = localStorage.getItem('dofus_compositions_dynamic');
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) savedCompositions = parsed;
+            } catch(e) {}
+        }
+        if (savedCompositions.length === 0) {
+            // Exemple : composition vide pour démarrer
+            savedCompositions.push({
+                id: Date.now(),
+                name: "Team départ",
+                teamData: new Array(DEFAULT_SLOTS).fill(null)
+            });
+            persistCompositions();
+        }
+        renderCompositionsList();
+    }
+
+    // Rendu des slots avec gestion drag/drop (interne + externe)
+    function renderTeamSlots() {
+        slotsContainer.innerHTML = '';
+        for (let i = 0; i < currentTeam.length; i++) {
+            const character = currentTeam[i];
+            const slotDiv = document.createElement('div');
+            slotDiv.className = 'team-slot';
+            slotDiv.setAttribute('data-slot-index', i);
+            
+            // Drag over / leave
+            slotDiv.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                slotDiv.classList.add('drag-over');
+            });
+            slotDiv.addEventListener('dragleave', () => slotDiv.classList.remove('drag-over'));
+            
+            // DROP : Ajout depuis librairie OU réorganisation interne
+            slotDiv.addEventListener('drop', (e) => {
+                e.preventDefault();
+                slotDiv.classList.remove('drag-over');
+                const targetIdx = parseInt(slotDiv.getAttribute('data-slot-index'), 10);
+                if (isNaN(targetIdx)) return;
+                
+                const reorderData = e.dataTransfer.getData('text/reorder');
+                const classDataRaw = e.dataTransfer.getData('text/plain');
+                
+                if (reorderData) {
+                    try {
+                        const { sourceIndex } = JSON.parse(reorderData);
+                        if (typeof sourceIndex === 'number' && sourceIndex !== targetIdx && currentTeam[sourceIndex]) {
+                            // Échange entre deux slots
+                            const sourceChar = currentTeam[sourceIndex];
+                            const targetChar = currentTeam[targetIdx];
+                            currentTeam[sourceIndex] = targetChar;
+                            currentTeam[targetIdx] = sourceChar;
+                            updateTeamAndPersist();
+                        }
+                    } catch(err) {}
+                } 
+                else if (classDataRaw) {
+                    try {
+                        const classObj = JSON.parse(classDataRaw);
+                        if (classObj && classObj.name && classObj.icon) {
+                            if (currentTeam[targetIdx] !== null) {
+                                if (!confirm(`Remplacer ${currentTeam[targetIdx].name} par ${classObj.name} ?`)) return;
+                            }
+                            currentTeam[targetIdx] = { ...classObj };
+                            updateTeamAndPersist();
+                        }
+                    } catch(err) {}
+                }
+            });
+            
+            // Numéro du slot
+            const slotNumber = document.createElement('div');
+            slotNumber.className = 'slot-number';
+            slotNumber.innerText = `${i+1}`;
+            
+            const slotContent = document.createElement('div');
+            slotContent.className = 'slot-content';
+            
+            if (character) {
+                const charInfo = document.createElement('div');
+                charInfo.className = 'character-info';
+                charInfo.setAttribute('draggable', 'true');
+                charInfo.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/reorder', JSON.stringify({ sourceIndex: i }));
+                    e.dataTransfer.effectAllowed = 'move';
+                    charInfo.style.opacity = '0.4';
+                });
+                charInfo.addEventListener('dragend', () => charInfo.style.opacity = '1');
+                
+                const iconSpan = document.createElement('i');
+                iconSpan.className = `${character.icon} char-icon`;
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'char-name';
+                nameSpan.innerText = character.name;
+                charInfo.appendChild(iconSpan);
+                charInfo.appendChild(nameSpan);
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.innerHTML = '<i class="fas fa-times-circle"></i>';
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    currentTeam[i] = null;
+                    updateTeamAndPersist();
+                });
+                slotContent.appendChild(charInfo);
+                slotContent.appendChild(removeBtn);
+            } else {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'empty-message';
+                emptyDiv.innerHTML = '<i class="fas fa-plus-circle"></i> Déposez une classe ici';
+                slotContent.appendChild(emptyDiv);
+            }
+            
+            slotDiv.appendChild(slotNumber);
+            slotDiv.appendChild(slotContent);
+            slotsContainer.appendChild(slotDiv);
+        }
+        updateSlotCounterUI();
+    }
+    
+    function updateTeamAndPersist() {
+        renderTeamSlots();
+        persistCurrentTeam();
+    }
+    
+    // Ajouter un slot (max 8)
+    function addSlot() {
+        if (currentTeam.length >= MAX_SLOTS) {
+            alert(`Maximum ${MAX_SLOTS} slots atteint !`);
+            return;
+        }
+        currentTeam.push(null);
+        updateTeamAndPersist();
+    }
+    
+    // Vider l'équipe (remet tous les slots à null)
+    function resetTeam() {
+        if (confirm("Vider complètement l'équipe actuelle ?")) {
+            for (let i = 0; i < currentTeam.length; i++) {
+                currentTeam[i] = null;
+            }
+            updateTeamAndPersist();
+        }
+    }
+    
+    // ---------- GESTION COMPOSITIONS (avec longueur variable) ----------
+    function renderCompositionsList() {
+        if (!compListContainer) return;
+        if (savedCompositions.length === 0) {
+            compListContainer.innerHTML = '<div style="text-align:center; color:#6b7c9e;">Aucune composition sauvegardée</div>';
+            return;
+        }
+        compListContainer.innerHTML = '';
+        savedCompositions.forEach(comp => {
+            const compDiv = document.createElement('div');
+            compDiv.className = 'comp-item';
+            const nonEmptyCount = comp.teamData.filter(c => c !== null).length;
+            const slotCount = comp.teamData.length;
+            const nameSpan = document.createElement('div');
+            nameSpan.className = 'comp-name';
+            nameSpan.innerHTML = `<i class="fas fa-helmet-battle"></i> <strong>${escapeHtml(comp.name)}</strong> <span style="font-size:0.7rem; color:#c9a03d;">(${nonEmptyCount}/${slotCount} persos)</span>`;
+            
+            const actions = document.createElement('div');
+            actions.className = 'comp-actions';
+            const loadBtn = document.createElement('button');
+            loadBtn.className = 'icon-btn';
+            loadBtn.innerHTML = '<i class="fas fa-folder-open"></i>';
+            loadBtn.title = "Charger cette composition";
+            loadBtn.onclick = () => loadComposition(comp.id);
+            
+            const overwriteBtn = document.createElement('button');
+            overwriteBtn.className = 'icon-btn';
+            overwriteBtn.innerHTML = '<i class="fas fa-save"></i>';
+            overwriteBtn.title = "Écraser avec l'équipe actuelle";
+            overwriteBtn.onclick = () => overwriteComposition(comp.id);
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'icon-btn danger-btn';
+            deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteBtn.title = "Supprimer";
+            deleteBtn.onclick = () => deleteComposition(comp.id);
+            
+            actions.appendChild(loadBtn);
+            actions.appendChild(overwriteBtn);
+            actions.appendChild(deleteBtn);
+            compDiv.appendChild(nameSpan);
+            compDiv.appendChild(actions);
+            compListContainer.appendChild(compDiv);
+        });
+    }
+    
+    function saveCurrentComposition() {
+        let compName = compNameInput.value.trim();
+        if (compName === "") {
+            alert("Veuillez donner un nom à votre composition");
+            return;
+        }
+        const existing = savedCompositions.find(c => c.name.toLowerCase() === compName.toLowerCase());
+        if (existing) {
+            if (confirm(`Une composition nommée "${compName}" existe déjà. Voulez-vous la remplacer ?`)) {
+                existing.teamData = JSON.parse(JSON.stringify(currentTeam));
+                persistCompositions();
+                renderCompositionsList();
+                alert(`Composition "${compName}" mise à jour !`);
+                compNameInput.value = "";
+                return;
+            } else return;
+        }
+        const newComp = {
+            id: Date.now(),
+            name: compName,
+            teamData: JSON.parse(JSON.stringify(currentTeam))
+        };
+        savedCompositions.push(newComp);
+        persistCompositions();
+        renderCompositionsList();
+        alert(`Composition "${compName}" sauvegardée !`);
+        compNameInput.value = "";
+    }
+    
+    function loadComposition(compId) {
+        const comp = savedCompositions.find(c => c.id === compId);
+        if (comp) {
+            if (confirm(`Charger "${comp.name}" ? L'équipe actuelle sera remplacée.`)) {
+                // Adapter la longueur : si la composition a un nombre de slots différent, on ajuste
+                const loadedTeam = JSON.parse(JSON.stringify(comp.teamData));
+                if (loadedTeam.length !== currentTeam.length) {
+                    if (loadedTeam.length > MAX_SLOTS) {
+                        alert("Erreur: composition invalide (trop de slots)");
+                        return;
+                    }
+                    currentTeam = loadedTeam;
+                } else {
+                    for (let i = 0; i < currentTeam.length; i++) currentTeam[i] = loadedTeam[i];
+                }
+                updateTeamAndPersist();
+            }
+        }
+    }
+    
+    function overwriteComposition(compId) {
+        const comp = savedCompositions.find(c => c.id === compId);
+        if (comp) {
+            if (confirm(`Écraser "${comp.name}" par l'équipe actuelle ?`)) {
+                comp.teamData = JSON.parse(JSON.stringify(currentTeam));
+                persistCompositions();
+                renderCompositionsList();
+                alert(`Composition "${comp.name}" mise à jour !`);
+            }
+        }
+    }
+    
+    function deleteComposition(compId) {
+        const comp = savedCompositions.find(c => c.id === compId);
+        if (comp && confirm(`Supprimer définitivement "${comp.name}" ?`)) {
+            savedCompositions = savedCompositions.filter(c => c.id !== compId);
+            persistCompositions();
+            renderCompositionsList();
+        }
+    }
+    
+    function clearAllCompositions() {
+        if (confirm("⚠️ Supprimer TOUTES les compositions sauvegardées ? (irréversible)")) {
+            savedCompositions = [];
+            persistCompositions();
+            renderCompositionsList();
+        }
+    }
+    
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Construction bibliothèque avec les classes mises à jour
+    function buildClassLibrary() {
+        classGridContainer.innerHTML = '';
+        CLASSES_LIST.forEach(cls => {
+            const card = document.createElement('div');
+            card.className = 'class-card';
+            card.setAttribute('draggable', 'true');
+            const dragPayload = JSON.stringify({ id: cls.id, name: cls.name, icon: cls.icon });
+            card.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', dragPayload);
+                e.dataTransfer.effectAllowed = 'copy';
+                card.style.opacity = '0.5';
+            });
+            card.addEventListener('dragend', () => card.style.opacity = '1');
+            const iconDiv = document.createElement('div');
+            iconDiv.className = 'class-icon';
+            iconDiv.innerHTML = `<i class="${cls.icon}"></i>`;
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'class-name';
+            nameDiv.innerText = cls.name;
+            card.appendChild(iconDiv);
+            card.appendChild(nameDiv);
+            classGridContainer.appendChild(card);
+        });
+    }
+    
+    // Empêcher les drops par défaut sur body
+    document.body.addEventListener('dragover', (e) => e.preventDefault());
+    document.body.addEventListener('drop', (e) => e.preventDefault());
+    
+    // INITIALISATION
+    function init() {
+        buildClassLibrary();
+        loadCurrentTeamFromStorage();
+        loadCompositionsFromStorage();
+        renderTeamSlots();
+        
+        addSlotBtn.addEventListener('click', addSlot);
+        resetBtn.addEventListener('click', resetTeam);
+        saveCompBtn.addEventListener('click', saveCurrentComposition);
+        clearAllCompsBtn.addEventListener('click', clearAllCompositions);
+        compNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') saveCurrentComposition();
+        });
+    }
+    
+    init();
+</script>
+</body>
+</html>
